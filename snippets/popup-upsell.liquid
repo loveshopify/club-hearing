@@ -1,0 +1,97 @@
+{% assign product =  all_products[product_handle] %}
+
+<div id="popup_upsell" class="remodal quick-shop js-quick-shop" data-remodal-id="popup_upsell" data-remodal-options="hashTracking: false">
+  <a data-remodal-action="close" class="remodal-close"></a>
+  <div class="container section">
+   
+ <div class="clearfix upsell_product_form init smart-payment-button--{{ show_payment_button }} {% if product.variants.size > 1 or product.options.size > 1 %}product_form_options{% endif %} product_form--{{ settings.product_form_style }}"
+        id="product-form-{{ product.id }}"
+        data-money-format="{{ shop.money_format }}"
+        data-shop-currency="{{ shop.currency }}"
+        data-select-id="product-select-{{ product.id }}{{ product-form }}{{ section.id }}{{ block.id }}"
+        data-enable-state="{% if template contains 'product' %}true{% else %}false{% endif %}"
+        data-product="{{ product | json | escape }}"
+        {% if settings.limit_quantity or settings.display_inventory_left %}
+          data-variant-inventory='[{%- for v in product.variants -%}{"id":{{v.id}},"inventory_quantity":{{v.inventory_quantity}},"inventory_management":"{{v.inventory_management}}","inventory_policy":"{{v.inventory_policy}}"}{% if forloop.last == false %},{% endif %}{%- endfor -%}]'
+        {% endif %}
+        data-product-id="{{ product.id }}"
+        >
+     {% form 'product', product %}
+   				<!---- product title and description------------->
+   	<div class="popup-top-heding">
+ 		<span class="title top-heding" itemprop="name">{{ product.title }}</span>
+    	  {% if product.description != blank %}
+             <div class="description" itemprop="description">
+               {{ product.description | split: '<!-- split -->' | first  | truncatewords: 20 }}
+             </div>
+    	  {% endif %}
+   			<!---- product image------------->
+      		<div class="popup-top-border-price">
+    		{% assign featured_image = product.selected_or_first_available_variant.featured_image | default: product.featured_image %}
+        	<img  src="{{  featured_image | product_img_url: '100x'    }}" 
+                 alt="{{ image_alt | escape }}" class=" lazyload {{ settings.image_loading_style }}"/>
+    		<span class="title" itemprop="name">{{ product.title }}</span>
+    		<!---- product price------------->	
+             {% if collection_handles contains 'coming-soon' %}
+            <span class="modal_price">{{ 'collections.general.coming_soon' | t }}</span>
+            {% else %}
+              <span class="price {% if product.compare_at_price_max > product.price %}sale{% endif %}">
+                {% if product.available %}
+                  {% if product.price_varies and product.price_min > 0 %}
+                    <small><em>{{ 'products.general.from' | t }}</em></small>
+                  {% endif %}
+                    {% if product.price_min > 0 %}
+                      <span class="money">{{ product.price_min | money }}</span>
+                    {% else %}
+                      {{ settings.free_price_text }}
+                    {% endif %}
+                {% else %}
+                  <span class="sold_out">{{ 'products.product.sold_out' | t }}</span>
+                {% endif %}
+                {% if product.compare_at_price_max > product.price %}
+                  <span class="was_price">
+                    <span class="money">{{ product.compare_at_price_max | money }}</span>
+                  </span>
+                {% endif %}
+              </span>
+            {% endif %}
+      </div>
+    </div>
+           {% if product.options.size > 1 %}
+            <div class="select">
+              <select id="product-select-{{ product.id }}{{ product-form }}{{ section.id }}{{ block.id }}" name="id" class="multi_select">
+                {% for v in product.variants %}
+                  <option {% if v == variant %}selected="selected"{% endif %} value="{{ v.id }}" data-sku="{{ v.sku }}">{{ v.title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          {% elsif product.options.size == 1 and product.variants.size > 1 or product.options.size == 1 and product.options[0] != "Title" %}
+            <div class="select">
+              <label>{{ product.options[0] }}</label>
+              <select id="product-select-{{ product.id }}{{ product-form }}{{ section.id }}{{ block.id }}" name="id">
+                {% for v in product.variants %}
+                  <option {% if v == variant %}selected="selected"{% endif %} value="{{ v.id }}" data-sku="{{ v.sku }}">{{ v.title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          {% else %}
+            <input type="hidden" name="id" value="{{ variant.id }}" />
+          {% endif %}
+   <div class="purchase-details-btn">
+    	<div class="purchase-details__quantity product-quantity-box">         
+          <span class="ss-icon product-minus js-change-quantity" data-func="minus"><span class="icon-minus"></span></span>
+          <input type="number" min="1" size="2" class="quantity upsell_quantity" name="quantity" id="quantity" value="1" {% if settings.limit_quantity and variant.inventory_management != blank and variant.inventory_policy == "deny" %}max="{{ variant.inventory_quantity }}"{% endif %} />
+          <span class="ss-icon product-plus js-change-quantity" data-func="plus"><span class="icon-plus"></span></span>
+        </div>
+    	<button type="button" id="add_upsell" name="add" class="action_button add_to_cart {% if show_payment_button %} action_button--secondary {% endif %}" data-label={{ add_to_cart_label | json }}>
+          <span class="text">{{ add_to_cart_label }}</span>
+          <svg x="0px" y="0px" width="32px" height="32px" viewBox="0 0 32 32" class="checkmark">
+            <path fill="none" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" d="M9,17l3.9,3.9c0.1,0.1,0.2,0.1,0.3,0L23,11"/>
+          </svg>
+        </button>
+   </div>
+   <a href="#" id="continue_shopping" class="secondary_button"> <span>No, Thanks - Continue Shopping</span> </a>
+  	 {% endform %}
+  </div>
+  </div>
+</div>

@@ -1,0 +1,277 @@
+<div class="container">
+ 
+  {% if section.settings.title != blank %}
+    <div class="sixteen columns">
+      <h2 class="title left">{{ section.settings.title | escape }}</h2>
+      <div class="feature_divider"></div>
+    </div>
+  {% endif %}
+ <div class="rt_container">
+  {% for block in section.blocks %}
+  {% if section.blocks.size == 1 %}
+    {%- assign column_width = 'sixteen columns' -%}
+    {% elsif section.blocks.size == 3 %}
+      {%- assign column_width = 'one-third column' -%}
+    {% elsif section.blocks.size == 4 %}
+      {%- assign column_width = 'four columns medium-down--one-half' -%}
+    {% elsif section.blocks.size == 5 %}
+      {%- assign column_width = 'four columns medium-down--one-half' -%}
+    {% else %}
+      {%- assign column_width = 'four columns medium-down--one-half' -%}
+    {% endif %}
+    <div class="{{ column_width }} rt_colums text-column" {{ block.shopify_attributes }}  {% if block.settings.Box %}style="background: #ebeffd;"{% endif %}>
+      <div class="border-style--{{ block.settings.border_style }} text-align--{{ block.settings.align_text }}"> 
+        {% if block.settings.enable_image %}
+          {% if block.settings.image != blank %}
+              <img  src="{{ block.settings.image.src | img_url: '100x' }}"
+                    class="rt_image lazyload {{ settings.image_loading_style }}"
+                    alt="{{ block.settings.image.alt }}"
+                    data-sizes="auto"
+                    data-src="{{ block.settings.image | img_url: '800x' }}"
+                    data-srcset=" {{ block.settings.image | img_url: '2048x' }} 2048w,
+                                  {{ block.settings.image | img_url: '1200x' }} 1200w,
+                                  {{ block.settings.image | img_url: '1000x' }} 1000w,
+                                  {{ block.settings.image | img_url: '800x' }} 800w,
+                                  {{ block.settings.image | img_url: '600x' }} 600w,
+                                  {{ block.settings.image | img_url: '400x' }} 400w"
+                     />
+            <noscript>
+              <p>
+                {{ block.settings.image | img_url: '480x480', scale: 2 | img_tag: block.settings.image.alt }}
+              </p>
+            </noscript>
+          {% else %}
+           
+          {% endif %}
+        {% endif %}
+        {% if block.settings.review != blank %}
+        <div class="rt_review">
+          {{ block.settings.review }}
+        </div>
+        {% endif %}
+        {% if block.settings.title != blank %}
+          <h3 class="{{ block.settings.heading_size }}">{{ block.settings.title | escape }}</h3>
+        {% endif %}
+        {% if block.settings.text != blank %}
+          <div class="rte-setting">{{ block.settings.text }}</div>
+        {% endif %}
+        {% if block.settings.button_label != blank and block.settings.button_link != blank %}
+          <a href="{{ block.settings.button_link }}" class="action_button continue-button">
+            {{ block.settings.button_label | escape }}
+          </a>
+        {% endif %}
+        {% if block.settings.review_image != blank and block.settings.review_name != blank %}
+          <div class="rt_style">
+            <div><img src="{{ block.settings.review_image | img_url: '130x130'}}"><h2>{{ block.settings.review_name }}</h2></div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  {% endfor %}
+  </div>
+</div>
+
+<style>
+  
+  {% if section.settings.background_color != blank %}
+  
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.background_color }};
+  }
+  
+  {% endif %}
+   
+  .rt_colums {
+    margin: 0 !important;
+    border: 1px solid #376ef0;
+    width: 25%;
+  }
+  .rt_container {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    float: left;
+    border: 1px solid #376ef0;
+    border-radius: 10px;
+    margin-bottom: 40px;
+    overflow: hidden;
+  }
+  .rt_container .regular_text {
+    color: rgb(0, 0, 0);
+    font-size: 24px;
+    padding: 30px 25px;
+    margin: 0;
+    line-height: 1;
+}
+  .rt_container .rte-setting>p {
+    padding: 15px;
+    font-size: 15px;
+}
+  .rt_container .action_button.continue-button {
+    margin: 0;
+    min-height: 90px;
+    width: 100%;
+    border: none;
+    color: #376ef0;
+    font-weight: bold;
+}
+  .rt_container .action_button.continue-button:hover {
+    background: #376ef0;
+    color: #fff;
+}
+  @media screen and(max-width:1000px) {
+  
+  }
+  
+</style>
+
+{% schema %}
+  {
+    "name": "pick-yours",
+    "class": "pick-yours",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Text columns with images"
+      },
+	  {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "text_block",
+        "name": "Column",
+        "settings": [
+          {
+            "type": "checkbox",
+            "id": "enable_image",
+            "label": "Show image",
+            "default": true
+          },
+          {
+            "type": "checkbox",
+            "id": "Box",
+            "label": "Box background"
+          },
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Heading"
+          },
+         {
+            "type": "html",
+            "id": "review",
+            "label": "Html"
+          },
+          {
+            "type": "select",
+            "id": "heading_size",
+            "label": "Heading size",
+            "options": [
+              {
+                "value": "regular_text",
+                "label": "Regular"
+              },
+              {
+                "value": "large_text",
+                "label": "Large"
+              }
+            ],
+            "default": "regular_text"
+          },
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Share blog posts, products, or promotions with your customers. Use this text to describe products, share details on availability and style, or as a space to display recent reviews or FAQs.</p>"
+          },
+          {
+            "type": "select",
+            "id": "align_text",
+            "label": "Text alignment",
+            "default": "left",
+            "options": [
+              {
+                "value": "left",
+                "label": "Left"
+              },
+              {
+                "value": "center",
+                "label": "Centered"
+              },
+              {
+                "value": "right",
+                "label": "Right"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "id": "button_label",
+            "label": "Button label"
+          },
+          {
+            "type": "url",
+            "id": "button_link",
+            "label": "Button link"
+          },
+          {
+            "type": "select",
+            "id": "border_style",
+            "label": "Border style",
+            "options": [
+              {
+                "value": "none",
+                "label": "None"
+              },
+              {
+                "value": "box",
+                "label": "Box"
+              },
+              {
+                "value": "quote",
+                "label": "Quote"
+              }
+            ],
+            "default": "none"
+          },
+         {
+            "type": "image_picker",
+            "id": "review_image",
+            "label": "Review Client Image"
+          },
+		{
+            "type": "text",
+            "id": "review_name",
+            "label": "Review Client Name"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "pick-yours",
+        "category": "Text",
+        "blocks": [
+          {
+            "type": "text_block"
+          },
+          {
+            "type": "text_block"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}
